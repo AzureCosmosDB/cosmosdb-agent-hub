@@ -1,31 +1,38 @@
-# Project
+# 🌌 Awesome Azure CosmosDB Agent Customizations
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+[![Powered by Azure Cosmos DB](https://img.shields.io/badge/Powered_by-Azure_Cosmos_DB-blue?logo=azurecosmosdb)](https://aka.ms/cosmosdb)
 
-As the maintainer of this project, please make a few updates:
+Enhance your **IDE agent / Copilot experience** with community-contributed [instructions](#-custom-instructions), [prompts](#-reusable-prompts), and [chat modes](#-custom-chat-modes) — all designed to make working with **Azure Cosmos DB** smoother, faster, and more consistent.
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+---
 
-## Contributing
+<details>
+<summary><strong>🎯 Azure CosmosDB + Agent Features</strong></summary>
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit [Contributor License Agreements](https://cla.opensource.microsoft.com).
+We provide a growing set of customizations to improve how AI agents (like GitHub Copilot or IDE assistants) interact with Cosmos DB:
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+| **🧩 [Custom Chat Modes](#-custom-chat-modes)** | **🎯 [Reusable Prompts](#-reusable-prompts)** | **📋 [Custom Instructions](#-custom-instructions)** |
+| --- | --- | --- |
+| Define agent behavior for Cosmos DB tasks: schema-free design, partition keys, query translation, error handling<br><br>**Benefits:**<br>• Context-aware Cosmos DB help<br>• Agent workflows for queries<br>• Tool-specific boundaries | Ready-to-use prompts for common Cosmos DB scenarios: query building, migrations, SDK usage, performance tuning<br><br>**Benefits:**<br>• Save time on repetitive tasks<br>• Share prompts across teams<br>• Parameterized for your DB setup | Define shared guidance for how agents should handle Cosmos DB–specific tasks: queries, SDK usage, error recovery, and best practices<br><br>**Benefits:**<br>• Consistency across repos<br>• Aligned with team standards<br>• Applied automatically in chat |
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+> **💡 Pro Tip:** Combine **instructions** for general Cosmos DB guidance, **prompt files** for task-specific workflows, and **chat modes** to shape the context your agent operates in.
 
-## Trademarks
+</details>
 
+---
+
+<details>
+<summary><strong>📝 Contributing</strong></summary>
+
+We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for how to share your Cosmos DB custom prompts, instructions, or examples.
+
+</details>
+
+## 🤝 Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+
+## ™️ Trademarks
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
 trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/legal/intellectualproperty/trademarks/usage/general).
