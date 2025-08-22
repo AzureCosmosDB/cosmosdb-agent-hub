@@ -11,6 +11,12 @@
 *.sln.docstates
 *.env
 
+# Sample application builds and dependencies
+samples/ecommerce-app/src/backend/node_modules/
+samples/ecommerce-app/src/frontend/node_modules/
+samples/ecommerce-app/src/frontend/build/
+samples/ecommerce-app/.env
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

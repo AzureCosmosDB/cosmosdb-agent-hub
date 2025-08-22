@@ -28,6 +28,50 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 
 </details>
 
+---
+
+## 🛍️ Sample Applications
+
+<details>
+<summary><strong>E-commerce Application with Azure Cosmos DB</strong></summary>
+
+Explore our comprehensive e-commerce sample application that demonstrates modern web development with Azure Cosmos DB:
+
+**📍 Location:** [`samples/ecommerce-app/`](./samples/ecommerce-app/)
+
+**Features:**
+- Product catalog management with efficient search and filtering
+- Real-time shopping cart with inventory validation
+- User management and order processing workflows
+- Optimized Azure Cosmos DB data models and query patterns
+- React TypeScript frontend with responsive design
+- Node.js Express backend with comprehensive API
+
+**Key Demonstrations:**
+- **Partition Key Strategies**: Products by category, orders by user ID
+- **Query Optimization**: Point reads, parameterized queries, composite indexes
+- **Real-time Updates**: Change feed integration for inventory management
+- **Performance Patterns**: Connection pooling, caching, pagination
+- **Error Handling**: Cosmos DB specific error codes and retry logic
+
+**GitHub Copilot Integration:**
+- Custom instructions for e-commerce development patterns
+- Chat modes specialized for Cosmos DB optimization
+- Reusable prompts for common e-commerce scenarios
+
+**Quick Start:**
+```bash
+cd samples/ecommerce-app
+npm run setup
+cp .env.example .env
+# Configure your Azure Cosmos DB connection
+npm run dev
+```
+
+[**→ Explore the E-commerce Sample**](./samples/ecommerce-app/)
+
+</details>
+
 ## 🤝 Code of Conduct
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
