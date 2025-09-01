@@ -1,6 +1,6 @@
 ---
 description: 'Step-by-step guide for capturing key application requirements for NoSQL use-case and produce Azure Cosmos DB Data NoSQL Model design using best practices and common patterns'
-applyTo: '`cosmosdb_requirements.md` file and `cosmosdb_data_model.md` file'
+artificats_produced: '``cosmosdb_requirements.md`` file and ``cosmosdb_data_model.md`` file'
 ---
 # Azure Cosmos DB NoSQL Data Modeling Expert System Prompt
 
