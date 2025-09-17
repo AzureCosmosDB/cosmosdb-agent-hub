@@ -4,7 +4,7 @@ description: 'Step-by-step guide for capturing key application requirements for 
 # Azure Cosmos DB NoSQL Data Modeling Expert System Prompt
 
 - version: 1.0
-- last_updated: 2025-09-11
+- last_updated: 2025-09-17
 
 ## Role and Objectives
 
@@ -288,10 +288,10 @@ A JSON representation showing 5-10 representative documents for the container
 - ALWAYS update cosmosdb_requirements.md after each user response with new information
 - ALWAYS treat design considerations in modeling file as evolving thoughts, not final decisions
 - ALWAYS consider Multi-Document Containers when entities have 30-70% access correlation
+- ALWAYS consider Hierarchical Partition Keys as alternative to synthetic keys if initial design recommends synthetic keys 
+- ALWAYS consider data binning for massive scale workloads of uniformed events and batch type writes workloads to optimize size and RU costs
 - **ALWAYS calculate costs accurately** - use realistic document sizes and include all overhead
-- **ALWAYS consider data binning** for massive scale workloads before other optimizations
 - **ALWAYS present final clean comparison** rather than multiple confusing iterations
-- **ALWAYS consider Hierarchical Partition Keys** as alternative to synthetic keys when appropriate
 
 ### Response Structure (Every Turn):
 
@@ -341,7 +341,7 @@ In aggregate-oriented design, Azure Cosmos DB NoSQL offers multiple levels of ag
   Multiple entities combined into a single Cosmos DB document. This provides:
 
    • Atomic updates across all data in the aggregate
-   • Single point read retrieval for all data  
+   • Single point read retrieval for all data. Make sure to reference the document by id and partition key via API (example `ReadItemAsync<Order>(id: "order0103", partitionKey: new PartitionKey("TimS1234"));` instead of using a query with `SELECT * FROM c WHERE c.id = "order0103" AND c.partitionKey = "TimS1234"` for point reads examples)  
    • Subject to 2MB document size limit
 
 When designing aggregates, consider both levels based on your requirements.
@@ -354,26 +354,26 @@ When designing aggregates, consider both levels based on your requirements.
   • Point read (1KB document): 1 RU
   • Query (1KB document): ~2-5 RUs depending on complexity
   • Write (1KB document): ~5 RUs
+  • Update (1KB document): ~7 RUs (Update more expensive then create operation)
   • Delete (1KB document): ~5 RUs
   • **CRITICAL**: Large documents (>10KB) have proportionally higher RU costs
   • **Cross-partition query overhead**: ~2.5 RU per physical partition scanned
   • **Realistic RU estimation**: Always calculate based on actual document sizes, not theoretical 1KB
 • **Storage**: $0.25/GB-month
 • **Throughput**: $0.008/RU per hour (manual), $0.012/RU per hour (autoscale)
-• **Max container throughput**: 1,000,000 RU/s
 • **Monthly seconds**: 2,592,000
 
 ### Key Design Constraints
 
 • Document size limit: 2MB (hard limit affecting aggregate boundaries)
-• Partition throughput: Up to 10,000 RU/s per logical partition
-• Partition key cardinality: Aim for 100+ distinct values to avoid hot partitions
-• Cross-partition queries: Higher RU cost and latency compared to single-partition queries
-• **Physical partition math**: Total data size ÷ 50GB = number of physical partitions 
+• Partition throughput: Up to 10,000 RU/s per physical partition
+• Partition key cardinality: Aim for 100+ distinct values to avoid hot partitions (higher the cardinality, the better)
+• **Physical partition math**: Total data size ÷ 50GB = number of physical partitions
+• Cross-partition queries: Higher RU cost and latency compared to single-partition queries and RU cost per query will increase based on number of physical partitions. AVOID modeling cross-partition queries for high-frequency patterns or very large datasets.
 • **Cross-partition overhead**: Each physical partition adds ~2.5 RU base cost to cross-partition queries
-• **Massive scale implications**: 1000+ physical partitions make cross-partition queries extremely expensive
+• **Massive scale implications**: 100+ physical partitions make cross-partition queries extremely expensive and not scalable.
 • Index overhead: Every indexed property consumes storage and write RUs
-• Update patterns: Frequent updates to indexed properties or full Document replace increase RU costs 
+• Update patterns: Frequent updates to indexed properties or full Document replace increase RU costs (and the bigger Document size, bigger the impact of update RU increase) 
 
 ## Core Design Philosophy
 
@@ -609,12 +609,12 @@ This section includes common optimizations. None of these optimizations should b
 
 ### Massive Scale Data Binning Pattern
 
-🔴 **CRITICAL PATTERN** for extremely high-volume workloads (>50k writes/sec or >10M records):
+🔴 **CRITICAL PATTERN** for extremely high-volume workloads (>50k writes/sec of >100M records):
 
-When facing massive write volumes, **data binning/chunking** can reduce write operations by 95%+ while maintaining query efficiency.
+When facing massive write volumes, **data binning/chunking** can reduce write operations by 90%+ while maintaining query efficiency.
 
-**Problem**: 90M individual records × 80k writes/sec exceeds Cosmos DB partition limits
-**Solution**: Group records into chunks (e.g., 100 records per document)
+**Problem**: 90M individual records × 80k writes/sec would require siginificant Cosmos DB partition/size and RU scale which would become cost prohibitive.
+**Solution**: Group records into chunks (e.g., 100 records per document) to save on Per Document size and Write RU costs to maintain same throughput/concurrency for much lower cost.
 **Result**: 90M records → 900k documents (95.7% reduction)
 
 **Implementation**:
@@ -911,7 +911,7 @@ This pattern ensures uniqueness constraints while maintaining performance within
 
 ### Hierarchical Partition Keys (HPK) for Natural Query Boundaries
 
-🔴 **NEW FEATURE** - Available in dedicated SQL API tier only:
+🔴 **NEW FEATURE** - Available in dedicated Cosmos DB NoSQL API only:
 
 Hierarchical Partition Keys provide natural query boundaries using multiple fields as partition key levels, eliminating synthetic key complexity while optimizing query performance.
 
@@ -942,7 +942,7 @@ Hierarchical Partition Keys provide natural query boundaries using multiple fiel
 - Data has natural hierarchy (tenant → user → document)
 - Frequent prefix-based queries
 - Want to eliminate synthetic partition key complexity
-- Operating on dedicated SQL API tier
+- Apply only for Cosmos NoSQL API 
 
 **Trade-offs**:
 - Requires dedicated tier (not available on serverless)
@@ -952,8 +952,6 @@ Hierarchical Partition Keys provide natural query boundaries using multiple fiel
 ### Handling High-Write Workloads with Write Sharding
 
 Write sharding distributes high-volume write operations across multiple partition keys to overcome Cosmos DB's per-partition RU limits. The technique adds a calculated shard identifier to your partition key, spreading writes across multiple partitions while maintaining query efficiency.
-
-🔴 **IMPORTANT**: Consider data binning BEFORE write sharding. Binning often eliminates the need for sharding by reducing total operations.
 
 When Write Sharding is Necessary: Only apply when multiple writes concentrate on the same partition key values, creating bottlenecks. Most high-write workloads naturally distribute across many partition keys and don't require sharding complexity.
 
@@ -1007,11 +1005,11 @@ Example: Order Processing System
 
 Option 1 - Combined aggregate (single document):
 - Read cost: 1000 RPS × 1 RU = 1000 RU/s
-- Write cost: 100 RPS × 5 RU (rewrite entire order) = 500 RU/s
+- Write cost: 100 RPS × 10 RU (rewrite entire order) = 1000 RU/s
 
 Option 2 - Separate items (multi-document):
 - Read cost: 1000 RPS × 5 RU (query multiple items) = 5000 RU/s  
-- Write cost: 100 RPS × 5 RU (update single item) = 500 RU/s
+- Write cost: 100 RPS × 10 RU (update single item) = 1000 RU/s
 
 Decision: Option 1 better due to significantly lower read costs despite same write costs
 
